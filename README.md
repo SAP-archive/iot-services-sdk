@@ -28,7 +28,7 @@ Please use GitHub issues to file a bug.
 
 ## License
 Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
-This file is licensed under the SAP Sample Code License except as noted otherwise in the [LICENSE file](LICENSE.md).
+This file is licensed under the SAP Sample Code License except as noted otherwise in the [LICENSE file](LICENSE.txt).
 
 ## Usage
 Please refer to the API documentation in the PDF file for details. You can check the tests for sample code.
