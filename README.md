@@ -1,4 +1,14 @@
-# sap-iot-services-cf-sdk
+**Table of Contents**
+
+- [Description](#description)
+- [Requirements](#requirements)
+- [Installation](#installation)
+- [How to obtain support](#how-to-obtain-support)
+- [License](#license)
+- [Usage](#usage)
+- [Test](#test)
+- [Build Docs](#build-docs)
+
 
 ## Description
 This package wraps the SAP IoT Services, Cloud Foundry Edition Device Management APIs as well as the REST and the MQTT Cloud Gateway APIs in easy-to-use Python code. You can find more information on the APIs [here](https://help.sap.com/viewer/643f531cbf50462c8cc45139ba2dd051/Cloud/en-US) and [here](https://help.sap.com/viewer/6040fec3f22e4f9b8bf495f3789d66b5/Cloud/en-US#).
