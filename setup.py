@@ -21,6 +21,7 @@ setup(
   author_email = 'philipp.steinroetter@sap.com',     
   url = 'https://github.com/SAP/iot-services-sdk',   
   keywords = 'SAP IoT Services CF SDK MQTT REST Device Management Internet of Things',
+  download_url='https://github.com/SAP/iot-services-sdk/archive/1.0.tar.gz',
   install_requires=['paho-mqtt', 'requests'],
   classifiers=[
     'Development Status :: 5 - Production/Stable',      
