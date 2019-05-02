@@ -38,7 +38,7 @@ Please use [GitHub Issues](https://github.com/SAP/iot-services-sdk/issues) to fi
 
 ## License
 Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
-This file is licensed under the SAP Sample Code License except as noted otherwise in the [LICENSE file](LICENSE.txt).
+This file is licensed under the SAP Sample Code License except as noted otherwise in the [LICENSE file](LICENSE).
 
 ## Usage
 Please refer to the API documentation in the PDF file for details. You can check the tests for sample code.
