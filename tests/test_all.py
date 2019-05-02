@@ -7,21 +7,21 @@ import paho.mqtt.client as paho
 
 from .config import get_config
 
-from sap_iot_services_sdk import AboutService
-from sap_iot_services_sdk import CapabilityService
-from sap_iot_services_sdk import DeviceService
-from sap_iot_services_sdk import GatewayService
-from sap_iot_services_sdk import ProtocolService
-from sap_iot_services_sdk import SensorTypeService
-from sap_iot_services_sdk import SensorService
-from sap_iot_services_sdk import TenantService
-from sap_iot_services_sdk import UserService
-from sap_iot_services_sdk import VendorService
+from iot_services_sdk import AboutService
+from iot_services_sdk import CapabilityService
+from iot_services_sdk import DeviceService
+from iot_services_sdk import GatewayService
+from iot_services_sdk import ProtocolService
+from iot_services_sdk import SensorTypeService
+from iot_services_sdk import SensorService
+from iot_services_sdk import TenantService
+from iot_services_sdk import UserService
+from iot_services_sdk import VendorService
 
-from sap_iot_services_sdk import DeviceManagementAPIException
-from sap_iot_services_sdk import RESTGatewayException
+from iot_services_sdk import DeviceManagementAPIException
+from iot_services_sdk import RESTGatewayException
 
-from sap_iot_services_sdk import MQTTClient
+from iot_services_sdk import MQTTClient
 
 class SDKTest(unittest.TestCase):
 

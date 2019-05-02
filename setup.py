@@ -9,8 +9,8 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
 setup(
-  name = 'sap_iot_services_sdk',         
-  packages = ['sap_iot_services_sdk'],   
+  name = 'iot_services_sdk',         
+  packages = ['iot_services_sdk'],   
   version = '1.0',     
   license='SAP Sample Code License',        
   description = 'SDK for SAP IoT Services on Cloud Foundry. Wraps all Device Management APIs as well as both Cloud Gateways.',  

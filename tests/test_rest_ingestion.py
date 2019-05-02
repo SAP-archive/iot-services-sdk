@@ -6,15 +6,15 @@ import os
 
 from .config import get_config
 
-from sap_iot_services_sdk import CapabilityService
-from sap_iot_services_sdk import DeviceService
-from sap_iot_services_sdk import GatewayService
-from sap_iot_services_sdk import SensorTypeService
-from sap_iot_services_sdk import SensorService
+from iot_services_sdk import CapabilityService
+from iot_services_sdk import DeviceService
+from iot_services_sdk import GatewayService
+from iot_services_sdk import SensorTypeService
+from iot_services_sdk import SensorService
 
-from sap_iot_services_sdk import RESTGatewayException
+from iot_services_sdk import RESTGatewayException
 
-from sap_iot_services_sdk import RestClient
+from iot_services_sdk import RestClient
 
 class RESTTest(unittest.TestCase):
 
