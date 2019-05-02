@@ -29,7 +29,7 @@ You will need an instance of IoT Services, Cloud Foundry to use this SDK. You ca
 ## Installation
 The package will be available at pip:
 
-`pip install sap_iot_services_sdk`
+`pip install iot-services-sdk`
 
 If you want to download it manually, please make sure to install `paho-mqtt` and `requests` into your Python environment.
 
