@@ -53,13 +53,13 @@ Here is a small example displaying the following functionality:
 ```python
 import os
 
-from sap_iot_services_sdk import CapabilityService
-from sap_iot_services_sdk import DeviceService
-from sap_iot_services_sdk import GatewayService
-from sap_iot_services_sdk import SensorTypeService
-from sap_iot_services_sdk import SensorService
+from iot_services_sdk import CapabilityService
+from iot_services_sdk import DeviceService
+from iot_services_sdk import GatewayService
+from iot_services_sdk import SensorTypeService
+from iot_services_sdk import SensorService
 
-from sap_iot_services_sdk import MQTTClient
+from iot_services_sdk import MQTTClient
 
 # Initialize services
 device_service = DeviceService(instance = myinstance.eu10.cp.iot.sap, user = myuser, password = mypassword)
