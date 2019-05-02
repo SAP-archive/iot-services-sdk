@@ -34,7 +34,7 @@ The package will be available at pip:
 If you want to download it manually, please make sure to install `paho-mqtt` and `requests` into your Python environment.
 
 ## How to obtain support
-Please use GitHub issues to file a bug.
+Please use [GitHub Issues](https://github.com/SAP/iot-services-sdk/issues) to file a bug.
 
 ## License
 Copyright (c) 2019 SAP SE or an SAP affiliate company. All rights reserved.
