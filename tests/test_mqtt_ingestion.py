@@ -96,7 +96,7 @@ class MQTTTest(unittest.TestCase):
             {'id': self.capability_measure_id, 'type': 'measure'},
             {'id': self.capability_cmd_id, 'type': 'command'}
         ]
-        create_response = self.sensor_type_service.create_sensor_type('123456', 'sdk_mqtt_test_type', capabilities)
+        create_response = self.sensor_type_service.create_sensor_type('12345', 'sdk_mqtt_test_type', capabilities)
 
         self.sensor_type_id = create_response.get_result().get('id')
         self.sensor_type_alternate_id = create_response.get_result().get('alternateId')
@@ -129,7 +129,7 @@ class MQTTTest(unittest.TestCase):
         ]
         message_info_measures = self.mqtt_client.publish(self.capability_measure_alternate_id, self.sensor_alternate_id, measures, self.device_alternate_id)
 
-        time.sleep(0.5)
+        time.sleep(5)
 
         get_measures_response = self.device_service.get_measures(self.device_id)
         measures = get_measures_response.get_result()
@@ -161,7 +161,7 @@ class MQTTTest(unittest.TestCase):
         command = {'sdk_test_cmd': 'I am a SDK!'}
         
         send_command_res = self.device_service.send_command_to_device(self.device_id, self.capability_cmd_id, self.sensor_id, command)
-        self.assertEqual(send_command_res.get_status_code(), 200)
+        self.assertEqual(send_command_res.get_status_code(), 202)
 
         time.sleep(2)
 

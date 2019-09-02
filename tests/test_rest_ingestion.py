@@ -120,7 +120,7 @@ class RESTTest(unittest.TestCase):
         data_ingestion_response = rest_client.post_measures(capability_alternate_id=self.capability_alternate_id, sensor_alternate_id=self.sensor_alternate_id, measures=measures)
         self.assertEqual(data_ingestion_response.get_status_code(), 202)
 
-        time.sleep(1)
+        time.sleep(5)
 
         get_measures_response = self.device_service.get_measures(self.device_id)
         measures = get_measures_response.get_result()

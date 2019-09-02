@@ -48,7 +48,7 @@ class DeviceService(IoTService):
         response = self.request_core(method='GET', service=self.service, headers=None, payload=None, accept_json=True, query=query)
         return response
 
-    def create_device(self, gateway_id: str, name: str, as_router=False, custom_properties=[]) -> Response:
+    def create_device(self, gateway_id: str, name: str, as_router=False, custom_properties=None) -> Response:
         """This endpoint is used to create a device.
         
         Arguments:
