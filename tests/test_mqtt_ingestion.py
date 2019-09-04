@@ -127,9 +127,9 @@ class MQTTTest(unittest.TestCase):
         measures = [
             {'sdk_test_temp': 30}
         ]
-        message_info_measures = self.mqtt_client.publish(self.capability_measure_alternate_id, self.sensor_alternate_id, measures, self.device_alternate_id)
+        self.mqtt_client.publish(self.capability_measure_alternate_id, self.sensor_alternate_id, measures)
 
-        time.sleep(5)
+        time.sleep(10)
 
         get_measures_response = self.device_service.get_measures(self.device_id)
         measures = get_measures_response.get_result()
@@ -144,7 +144,7 @@ class MQTTTest(unittest.TestCase):
         measures = [
             {'i_am_invalid': 30}
         ]
-        message_info_measures = self.mqtt_client.publish(self.capability_measure_alternate_id, self.sensor_alternate_id, measures, self.device_alternate_id)
+        self.mqtt_client.publish(self.capability_measure_alternate_id, self.sensor_alternate_id, measures, self.device_alternate_id)
 
         time.sleep(0.5)
 

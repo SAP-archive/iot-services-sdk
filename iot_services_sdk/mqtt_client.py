@@ -128,15 +128,17 @@ class MQTTClient(PahoMQTT):
         return super(MQTTClient, self).subscribe(service, 1)
 
     def _ack_message_handler(self, client, userdata, message):
-        messageInfos = json.loads(message.payload.decode("utf-8"))
+        message_infos = json.loads(message.payload.decode("utf-8"))
+        print(message_infos)
         report = []
-        for msgInfo in messageInfos:
-            if msgInfo.get('code') != 200 and msgInfo.get('code') != 202:
-                error = {}
-                error['message'] = self._message_buffer[msgInfo['id']]
-                error['error'] = ' '.join(msgInfo['messages'])
+        for msg_info in message_infos:
+            if msg_info.get('code') != 200 and msg_info.get('code') != 202:
+                error = {
+                    'message': self._message_buffer.get(msg_info.get('id')),
+                    'error': ' '.join(msg_info.get('messages'))
+                }
                 report.append(error)
-            del self._message_buffer[msgInfo['id']]
+            del self._message_buffer[msg_info.get('id')]
 
         if len(report) > 0:
             self.on_error(self, userdata, report)
@@ -174,56 +176,20 @@ class MQTTClient(PahoMQTT):
         """
         if device_alternate_id is None:
             device_alternate_id = self.device_alternate_id
+        
         service = 'measures/' + device_alternate_id
-        measureMessageId = str(uuid.uuid4())
+        measure_message_id = str(uuid.uuid4())
         payload = {
             "timestamp": current_milli_time(),
             "capabilityAlternateId": capability_alternate_id,
             "sensorAlternateId": sensor_alternate_id,
-            "measureMessageId": measureMessageId,
+            "measureMessageId": measure_message_id,
             "measures": measures
         }
 
         if timestamp is not None:
             payload['timestamp'] = timestamp            
 
-        self._message_buffer[measureMessageId] = payload
+        self._message_buffer[measure_message_id] = payload
         payload_json = json.dumps(payload)
         return super(MQTTClient, self).publish(service, payload=payload_json)
-
-    def simulate(self, device_alternate_id: str, capability_alternate_id: str, sensor_alternate_id: str, measures: list, interval=1, runtime=60):
-        """Simulate measures for device
-        
-        Arguments:
-            device_alternate_id {str} --  Alternate ID of the device you want to simulate data for
-            capability_alternate_id {str} -- Alternate ID of the capability you want to simulate data for
-            sensor_alternate_id {str} -- Alternate ID of the sensor you want to simulate data for
-            measures {list} -- List of dicts with one dict for each measure. You need to provide the field 'key' with the respective key of the measure you want to simulate. In 'dataType' you need to provide the respective data type. The function supports 'string', 'double', 'integer', 'boolean', and 'binary'. For data types 'double' and 'integer' you need to provide 'min' and 'max'. For data types 'string' and 'binary' you need to provide a list of allowed strings in 'allowedStrings', from which is randomly chosen. 
-        
-        Keyword Arguments:
-            interval {int} -- The interval in seconds in which the data should be send (default: {1})
-            runtime {int} -- Defines how long the simulation should be run in seconds (default: {60})
-        """
-        start_time = datetime.now()
-        while (datetime.now() - start_time).seconds < runtime:
-            try:
-                simulated_measures = []
-                for measure in measures:
-                    simulated_measure = {}
-                    value = None
-                    if (measure['dataType'] == 'string'):
-                        value = measure['allowedStrings'][random.randint(0, len(measure['allowedStrings']))]
-                    elif (measure['dataType'] == 'double' or measure['dataType'] == 'float' or measure['dataType'] == 'long'):
-                        value = random.uniform(measure['min'], measure['max'])
-                    elif (measure['dataType'] == 'integer'):
-                        value = random.randint(measure['min'], measure['max'])
-                    elif (measure['dataType'] == 'boolean'):
-                        value = bool(random.getrandbits(1))
-                    elif (measure['dataType'] == 'binary'):
-                        value = base64.b64encode(measure['allowedStrings'][random.randint(0, len(measure['allowedStrings']))])
-                    simulated_measure[measure['key']] = value
-                    simulated_measures.append(simulated_measure)
-                self.publish(device_alternate_id, capability_alternate_id, sensor_alternate_id, simulated_measures)
-                time.sleep(interval)
-            except IOError:
-                print("Error while sending measures to SAP IoT Service.")
