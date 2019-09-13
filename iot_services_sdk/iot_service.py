@@ -120,7 +120,6 @@ class IoTService(object):
                 return Response(response.status_code, response.text, response.headers)
         except requests.exceptions.HTTPError as err:
             try:
-                error = json.loads(err.response.text)['message']
-                raise DeviceManagementAPIException(error)
+                raise DeviceManagementAPIException(json.loads(err.response.text)['message'])
             except json.decoder.JSONDecodeError:
-                raise Exception(err)
+                raise DeviceManagementAPIException(err)
