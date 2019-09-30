@@ -125,3 +125,5 @@ config.ini
 .vscode/extensions.json
 
 .idea/*
+
+test.py

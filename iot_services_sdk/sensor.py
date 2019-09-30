@@ -1,28 +1,33 @@
 """ Author: Philipp Steinrötter (steinroe) """
 
-from .iot_service import IoTService, Response
+from .tenant_iot_service import TenantIoTService
 from .utils import build_query
+from .response import Response
 
-class SensorService(IoTService):
+
+class SensorService(TenantIoTService):
     def __init__(self,
-                instance,
-                user,
-                password):
+                 instance,
+                 user,
+                 password,
+                 tenant_id):
         """Instantiate SensorService object
         
         Arguments:
             instance {string} -- IoT Services instance
             user {string} -- IoT Services user
             password {string} -- IoT Services password
+            tenant_id {string} -- Id of the tenant
         """
 
         self.service = '/sensors'
 
-        IoTService.__init__(
+        TenantIoTService.__init__(
             self,
             instance=instance,
             user=user,
-            password=password
+            password=password,
+            tenant_id=tenant_id
         )
 
     def get_sensors(self, filters=None, orderby=None, asc=True, skip=None, top=None) -> Response:
@@ -39,8 +44,16 @@ class SensorService(IoTService):
             Response -- Response object
         """
         query = build_query(filters=filters, orderby=orderby, asc=asc, skip=skip, top=top)
-        response = self.request_core(method='GET', service=self.service, query=query, accept_json=True)
-        return response
+        return super().request_core(method='GET', service=self.service, query=query, accept_json=True)
+
+    def get_sensor_count(self):
+        """The endpoint returns the count of all sensors.
+
+        Returns:
+            Response -- Response object
+        """
+        service = self.service + '/count'
+        return super().request_core(method='GET', service=service, accept_json=True)
 
     def create_sensor(self, device_id: str, alternate_id: str, name: str, sensor_type_id: str) -> Response:
         """This endpoint is used to create a sensor.
@@ -54,10 +67,10 @@ class SensorService(IoTService):
         Returns:
             Response -- Response object
         """
-        headers = {'Content-Type' : 'application/json'}
+        headers = {'Content-Type': 'application/json'}
         payload = '{ "deviceId": "' + device_id + '", "alternateId": "' + alternate_id + '", "name": "' + name + '", "sensorTypeId": "' + sensor_type_id + '"}'
-        response = self.request_core(method='POST', service=self.service, headers=headers, payload=payload, accept_json=True)
-        return response
+        return super().request_core(method='POST', service=self.service, headers=headers, payload=payload,
+                                    accept_json=True)
 
     def delete_sensor(self, sensor_id: str) -> Response:
         """The endpoint is used to delete the sensor associated to the given id.
@@ -69,8 +82,7 @@ class SensorService(IoTService):
             Response -- Response object
         """
         service = self.service + '/' + sensor_id
-        response = self.request_core(method='DELETE', service=service, accept_json=True)
-        return response        
+        return super().request_core(method='DELETE', service=service, accept_json=True)
 
     def get_sensor(self, sensor_id: str) -> Response:
         """The endpoint returns the sensor associated to the given id.
@@ -82,8 +94,7 @@ class SensorService(IoTService):
             Response -- Response object
         """
         service = self.service + '/' + sensor_id
-        response = self.request_core(method='GET', service=service, accept_json=True)
-        return response
+        return super().request_core(method='GET', service=service, accept_json=True)
 
     def update_sensor(self, sensor_id: str, name: str, sensor_type_id: str) -> Response:
         """This endpoint is used to update a sensor associated to the given id with details specified in the request body.
@@ -97,8 +108,51 @@ class SensorService(IoTService):
             Response -- [description]
         """
         service = self.service + '/' + sensor_id
-        headers = {'Content-Type' : 'application/json'}
+        headers = {'Content-Type': 'application/json'}
         payload = '{ "name" : "' + name + '", "sensorTypeId" : "' + sensor_type_id + '" }'
-        response = self.request_core(method='PUT', service=service, headers=headers, payload=payload, accept_json=True)
-        return response
-    
+        return super().request_core(method='PUT', service=service, headers=headers, payload=payload, accept_json=True)
+
+    def add_custom_property(self, sensor_id: str, key: str, value: str) -> Response:
+        """The endpoint is used to add a custom property to the sensor associated to the given id.
+
+        Arguments:
+            sensor_id {str} --  Unique identifier of a sensor
+            key {str} -- Key of the custom property
+            value {str} -- Value of the custom property
+
+        Returns:
+            Response -- Response object
+        """
+        service = self.service + '/' + sensor_id + '/customProperties'
+        headers = {'Content-Type': 'application/json'}
+        payload = '{ "key" : "' + key + '", "value" : "' + value + '" }'
+        return super().request_core(method='POST', service=service, headers=headers, payload=payload, accept_json=True)
+
+    def delete_custom_property(self, sensor_id: str, key: str) -> Response:
+        """Delete a custom property from the sensor associated to the given id.
+
+        Arguments:
+            sensor_id {str} -- Unique identifier of a sensor
+            key {str} -- Key of the custom property
+
+        Returns:
+            Response -- Response object
+        """
+        service = self.service + '/' + sensor_id + '/customProperties/' + key
+        return super().request_core(method='DELETE', service=service, accept_json=True)
+
+    def update_custom_property(self, sensor_id: str, key: str, value: str) -> Response:
+        """Updates a custom property of the sensor associated to the given id. The ‘key’ attribute cannot be modified.
+
+        Arguments:
+            sensor_id {str} -- Unique identifier of a sensor
+            key {str} -- Key of the custom property
+            value {str} -- The updated value of the custom property
+
+        Returns:
+            Response -- Response object
+        """
+        service = self.service + '/' + sensor_id + '/customProperties/' + key
+        headers = {'Content-Type': 'application/json'}
+        payload = '{ "key" : "' + key + '", "value" : "' + value + '" }'
+        return super().request_core(method='PUT', service=service, headers=headers, payload=payload, accept_json=True)

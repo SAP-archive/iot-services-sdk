@@ -2,14 +2,16 @@
 
 import json
 
-from .iot_service import IoTService, Response
+from .iot_service import IoTService
 from .utils import build_query
+from .response import Response
+
 
 class UserService(IoTService):
     def __init__(self,
-                instance,
-                user,
-                password):
+                 instance,
+                 user,
+                 password):
         """Instantiate UserService object
         
         Arguments:
@@ -41,8 +43,7 @@ class UserService(IoTService):
             Response -- Response object
         """
         query = build_query(filters=filters, orderby=orderby, asc=asc, skip=skip, top=top)
-        response = self.request_core(method='GET', service=self.service, query=query, accept_json=True)
-        return response
+        return super().request_core(method='GET', service=self.service, query=query, accept_json=True)
 
     def create_user(self, name: str, password: str, custom_properties=[]) -> Response:
         """The endpoint is used to create a user. Note: This function only supports basic authentication method.
@@ -55,10 +56,20 @@ class UserService(IoTService):
         Returns:
             Response -- Response object
         """
-        headers = {'Content-Type' : 'application/json'}
-        payload = json.dumps({"name": name,"customProperties": custom_properties, "authentications": [{"type": "basic", "password": password}]})
-        response = self.request_core(method='POST', service=self.service, headers=headers, payload=payload, accept_json=True)
-        return response
+        headers = {'Content-Type': 'application/json'}
+        payload = json.dumps({"name": name, "customProperties": custom_properties,
+                              "authentications": [{"type": "basic", "password": password}]})
+        return super().request_core(method='POST', service=self.service, headers=headers, payload=payload,
+                                    accept_json=True)
+
+    def get_user_count(self) -> Response:
+        """The endpoint is used to delete the user associated to the given id.
+
+        Returns:
+            Response -- Response object
+        """
+        service = self.service + '/count'
+        return super().request_core(method='GET', service=service, accept_json=True)
 
     def delete_user(self, user_id: str) -> Response:
         """The endpoint is used to delete the user associated to the given id.
@@ -70,8 +81,7 @@ class UserService(IoTService):
             Response -- Response object
         """
         service = self.service + '/' + user_id
-        response = self.request_core(method='DELETE', service=service, accept_json=True)
-        return response
+        return super().request_core(method='DELETE', service=service, accept_json=True)
 
     def get_user(self, user_id: str) -> Response:
         """The endpoint returns the user associated to the given id.
@@ -83,8 +93,7 @@ class UserService(IoTService):
             Response -- Response object
         """
         service = self.service + '/' + user_id
-        response = self.request_core(method='GET', service=service, accept_json=True)
-        return response
+        return super().request_core(method='GET', service=service, accept_json=True)
 
     def update_password(self, user_id: str, password: str) -> Response:
         """The endpoint is used to update the password of the user associated to the given id.
@@ -97,37 +106,10 @@ class UserService(IoTService):
             Response -- Response object
         """
         service = self.service + '/' + user_id + '/authentications/basic'
-        headers = {'Content-Type' : 'application/json'}
+        headers = {'Content-Type': 'application/json'}
         payload = '{ "password": "' + password + '" }'
-        response = self.request_core(method='PUT', service=service, headers=headers, payload=payload, accept_json=True)
-        return response
+        return super().request_core(method='PUT', service=service, headers=headers, payload=payload, accept_json=True)
 
-    def get_p12_certificate(self, user_id: str) -> Response:
-        """The endpoint is used to download a user specific p12 file for authentication.
-        
-        Arguments:
-            user_id {str} -- Unique identifier of a user
-        
-        Returns:
-            Response -- Response object
-        """
-        service = self.service + '/' + user_id + '/authentications/clientCertificate/p12'
-        response = self.request_core(method='GET', service=service, accept_json=True)
-        return response
-
-    def get_pem_certificate(self, user_id: str) -> Response:
-        """The endpoint is used to download a user specific private key and certificate in PEM format for authentication.
-        
-        Arguments:
-            user_id {str} -- Unique identifier of a user
-        
-        Returns:
-            Response -- Response object
-        """
-        service = self.service + '/' + user_id + '/authentications/clientCertificate/pem'
-        response = self.request_core(method='GET', service=service, accept_json=True)
-        return response
-    
     def add_custom_property(self, user_id: str, key: str, value: str) -> Response:
         """The endpoint is used to add a custom property to the user associated to the given id.
         
@@ -140,10 +122,9 @@ class UserService(IoTService):
             Response -- Response object
         """
         service = self.service + '/' + user_id + '/customProperties'
-        headers = {'Content-Type' : 'application/json'}
+        headers = {'Content-Type': 'application/json'}
         payload = '{ "key" : "' + key + '", "value" : "' + value + '" }'
-        response = self.request_core(method='POST', service=service, headers=headers, payload=payload, accept_json=True)
-        return response
+        return super().request_core(method='POST', service=service, headers=headers, payload=payload, accept_json=True)
 
     def delete_custom_property(self, user_id: str, key: str) -> Response:
         """The endpoint is used to delete a custom property from the user associated to the given id.
@@ -156,8 +137,7 @@ class UserService(IoTService):
             Response -- Response object
         """
         service = self.service + '/' + user_id + '/customProperties/' + key
-        response = self.request_core(method='DELETE', service=service, accept_json=True)
-        return response
+        return super().request_core(method='DELETE', service=service, accept_json=True)
 
     def update_custom_property(self, user_id: str, key: str, value: str) -> Response:
         """The endpoint is used to update a custom property of the user associated to the given id. The ‘key’ attribute cannot be modified.
@@ -171,10 +151,9 @@ class UserService(IoTService):
             Response -- Response object
         """
         service = self.service + '/' + user_id + '/customProperties/' + key
-        headers = {'Content-Type' : 'application/json'}
+        headers = {'Content-Type': 'application/json'}
         payload = '{ "key" : "' + key + '", "value" : "' + value + '" }'
-        response = self.request_core(method='PUT', service=service, headers=headers, payload=payload, accept_json=True)
-        return response
+        return super().request_core(method='PUT', service=service, headers=headers, payload=payload, accept_json=True)
 
     def add_role(self, user_id: str, role: str) -> Response:
         """The endpoint is used to add a role to user associated to the given id. The role is valid across the instance.
@@ -187,10 +166,9 @@ class UserService(IoTService):
             Response -- Response object
         """
         service = self.service + '/' + user_id + '/roles'
-        headers = {'Content-Type' : 'application/json'}
+        headers = {'Content-Type': 'application/json'}
         payload = '{ "role" : "' + role + '" }'
-        response = self.request_core(method='POST', service=service, headers=headers, payload=payload, accept_json=True)
-        return response
+        return super().request_core(method='POST', service=service, headers=headers, payload=payload, accept_json=True)
 
     def delete_role(self, user_id: str, role: str) -> Response:
         """The endpoint is used to delete the role from user associated to the given id. The role is valid across the instance.
@@ -203,5 +181,16 @@ class UserService(IoTService):
             Response -- Response object
         """
         service = self.service + '/' + user_id + '/roles/' + role
-        response = self.request_core(method='DELETE', service=service, accept_json=True)
-        return response
+        return super().request_core(method='DELETE', service=service, accept_json=True)
+
+    def get_tenants(self, user_id: str) -> Response:
+        """The endpoint returns a list of tenants assigned to the user associated with the given id.
+
+        Arguments:
+            user_id {str} -- Unique identifier of a user
+
+        Returns:
+            Response -- Response object
+        """
+        service = self.service + '/' + user_id + '/tenants'
+        return super().request_core(method='GET', service=service, accept_json=True)

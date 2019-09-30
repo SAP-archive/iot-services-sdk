@@ -1,13 +1,15 @@
 """ Author: Philipp Steinrötter (steinroe) """
 
-from .iot_service import IoTService, Response
+from .iot_service import IoTService
 from .utils import build_query
+from .response import Response
+
 
 class ProtocolService(IoTService):
     def __init__(self,
-                instance,
-                user,
-                password):
+                 instance,
+                 user,
+                 password):
         """Instantiate ProtocolService object
         
         Arguments:
@@ -35,8 +37,16 @@ class ProtocolService(IoTService):
             Response -- Response object
         """
         query = build_query(skip=skip, top=top)
-        response = self.request_core(method='GET', service=self.service, query=query, accept_json=True)
-        return response
+        return super().request_core(method='GET', service=self.service, query=query, accept_json=True)
+
+    def get_protocol_count(self):
+        """The endpoint returns the count of all protocols.
+
+        Returns:
+            Response -- Response object
+        """
+        service = self.service + '/count'
+        return super().request_core(method='GET', service=service, accept_json=True)
 
     def create_protocol(self, protocol_id: str) -> Response:
         """he endpoint is used to create a protocol. The new protocol is visible for all tenants of the instance.
@@ -47,10 +57,10 @@ class ProtocolService(IoTService):
         Returns:
             Response -- Response object
         """
-        headers = {'Content-Type' : 'application/json'}
+        headers = {'Content-Type': 'application/json'}
         payload = '{ "id" : "' + protocol_id + '" }'
-        response = self.request_core(method='POST', service=self.service, headers=headers, payload=payload, accept_json=True)
-        return response
+        return super().request_core(method='POST', service=self.service, headers=headers, payload=payload,
+                                    accept_json=True)
 
     def delete_protocol(self, protocol_id: str) -> Response:
         """The endpoint is used to delete a protocol. Deleting is possible only if no tenant on the instance is using it anymore.
@@ -62,5 +72,4 @@ class ProtocolService(IoTService):
             Response -- Response object
         """
         service = self.service + '/' + protocol_id
-        response = self.request_core(method='DELETE', service=service, accept_json=True)
-        return response
+        return super().request_core(method='DELETE', service=service, accept_json=True)

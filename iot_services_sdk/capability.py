@@ -2,29 +2,34 @@
 
 import json
 
-from .iot_service import IoTService, Response
+from .tenant_iot_service import TenantIoTService
 from .utils import build_query
+from .response import Response
 
-class CapabilityService(IoTService):
+
+class CapabilityService(TenantIoTService):
     def __init__(self,
-                instance,
-                user,
-                password):
+                 instance,
+                 user,
+                 password,
+                 tenant_id):
         """Instantiate CapabilityService object
         
         Arguments:
             instance {string} -- IoT Services instance
             user {string} -- IoT Services user
             password {string} -- IoT Services password
+            tenant_id {string} -- Id of the tenant
         """
 
         self.service = '/capabilities'
-        
-        IoTService.__init__(
+
+        TenantIoTService.__init__(
             self,
             instance=instance,
             user=user,
-            password=password
+            password=password,
+            tenant_id=tenant_id
         )
 
     def get_capabilities(self, filters=None, orderby=None, asc=True, skip=None, top=None) -> Response:
@@ -42,8 +47,8 @@ class CapabilityService(IoTService):
         """
 
         query = build_query(filters=filters, orderby=orderby, asc=asc, skip=skip, top=top)
-        r = self.request_core(method='GET', service=self.service, headers=None, payload=None, accept_json=True, query=query)
-        return r
+        return super().request_core(method='GET', service=self.service, headers=None, payload=None, accept_json=True,
+                                    query=query)
 
     def create_capability(self, alternate_id: str, name: str, properties: list) -> Response:
         """This endpoint is used to create a capability.
@@ -56,10 +61,19 @@ class CapabilityService(IoTService):
         Returns:
             Response -- Response object
         """
-        headers = {'Content-Type' : 'application/json'}
-        payload = json.dumps({"alternateId": alternate_id,"name": name,"properties": properties})
-        response = self.request_core(method='POST', service=self.service, headers=headers, payload=payload, accept_json=True)
-        return response
+        headers = {'Content-Type': 'application/json'}
+        payload = json.dumps({"alternateId": alternate_id, "name": name, "properties": properties})
+        return super().request_core(method='POST', service=self.service, headers=headers, payload=payload,
+                                    accept_json=True)
+
+    def get_capability_count(self) -> Response:
+        """The endpoint returns the count of all capabilities.
+
+        Returns:
+            Response -- Response object
+        """
+        service = self.service + '/count'
+        return super().request_core(method='GET', service=service, accept_json=True)
 
     def delete_capability(self, capability_id: str) -> Response:
         """The endpoint is used to delete the capability associated to the given id.
@@ -71,8 +85,7 @@ class CapabilityService(IoTService):
             Response -- Response object
         """
         service = self.service + '/' + capability_id
-        response = self.request_core(method='DELETE', service=service, accept_json=True)
-        return response
+        return super().request_core(method='DELETE', service=service, accept_json=True)
 
     def get_capability(self, capability_id: str) -> Response:
         """The endpoint returns the capability associated to the given id.
@@ -84,22 +97,28 @@ class CapabilityService(IoTService):
             Response -- Response object
         """
         service = self.service + '/' + capability_id
-        response = self.request_core(method='GET', service=service, accept_json=True)
-        return response
+        return super().request_core(method='GET', service=service, accept_json=True)
 
-    def update_capability(self, capability_id: str, alternate_id: str, name: str) -> Response:
+    def update_capability(self, capability_id: str, alternate_id: str = None, name: str = None, properties: list = None) -> Response:
         """This endpoint is used to update the capability associated to the given id with details specified in the request body.
         
         Arguments:
             capability_id {str} -- Unique identifier of a capability
             alternate_id {str} -- Alternate identifier of a capability
             name {str} -- Name of a capability
+            properties {list} -- Properties of the capability
         
         Returns:
             Response -- Response object
         """
         service = self.service + '/' + capability_id
-        headers = {'Content-Type' : 'application/json'}
-        payload = '{ "alternateId" : "' + alternate_id + '", "name" : "' + name + '" }'
-        response = self.request_core(method='PUT', service=service, headers=headers, payload=payload, accept_json=True)
-        return response
+        headers = {'Content-Type': 'application/json'}
+        payload = {}
+        if alternate_id is not None:
+            payload['alternateId'] = alternate_id
+        if name is not None:
+            payload['name'] = name
+        if properties is not None:
+            payload['properties'] = properties
+        payload_json = json.dumps(payload)
+        return super().request_core(method='PUT', service=service, headers=headers, payload=payload_json, accept_json=True)

@@ -1,13 +1,15 @@
 """ Author: Philipp Steinrötter (steinroe) """
 
-from .iot_service import IoTService, Response
+from .iot_service import IoTService
 from .utils import build_query
+from .response import Response
+
 
 class VendorService(IoTService):
     def __init__(self,
-                instance,
-                user,
-                password):
+                 instance,
+                 user,
+                 password):
         """Instantiate VendorService object
         
         Arguments:
@@ -36,8 +38,16 @@ class VendorService(IoTService):
             Response -- Response object
         """
         query = build_query(skip=skip, top=top)
-        response = self.request_core(method='GET', service=self.service, query=query, accept_json=True)
-        return response
+        return super().request_core(method='GET', service=self.service, query=query, accept_json=True)
+
+    def get_vendor_count(self):
+        """The endpoint returns the count of all vendors.
+
+        Returns:
+            Response -- Response object
+        """
+        service = self.service + '/count'
+        return super().request_core(method='GET', service=service)
 
     def create_vendor(self, vendor_id: str) -> Response:
         """The endpoint is used to create a new vendor. The new vendor is visible for all tenants of the instance.
@@ -48,10 +58,10 @@ class VendorService(IoTService):
         Returns:
             Response -- Response object
         """
-        headers = {'Content-Type' : 'application/json'}
+        headers = {'Content-Type': 'application/json'}
         payload = '{ "id": "' + vendor_id + '" }'
-        response = self.request_core(method='POST', service=self.service, headers=headers, payload=payload, accept_json=True)
-        return response
+        return super().request_core(method='POST', service=self.service, headers=headers, payload=payload,
+                                    accept_json=True)
 
     def delete_vendor(self, vendor_id: str) -> Response:
         """The endpoint is used to delete a vendor. Deleting is possible only if no tenant on the instance is using it anymore.
@@ -63,5 +73,4 @@ class VendorService(IoTService):
             Response -- Response object
         """
         service = self.service + '/' + vendor_id
-        response = self.request_core(method='DELETE', service=service, accept_json=True)
-        return response
+        return super().request_core(method='DELETE', service=service, accept_json=True)

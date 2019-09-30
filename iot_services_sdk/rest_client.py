@@ -4,14 +4,15 @@ from requests.adapters import HTTPAdapter
 
 import json
 import requests
-import sys
 import ssl
 
-from .iot_service import Response
+from .response import Response
 from .utils import current_milli_time
+
 
 class RESTGatewayException(Exception):
     pass
+
 
 class RestClient(object):
 
@@ -56,17 +57,17 @@ class RestClient(object):
         try:
             response = self.session.request(method='POST', url=service, data=payload, headers=headers)
             response.raise_for_status()
-            if (response.status_code == 207):
+            if response.status_code == 207:
                 # Batch upload with partial failure. Raise Exception.
-                raise RESTGatewayException(self._parseError(json.loads(response.text)))
+                raise RESTGatewayException(self._parse_error(json.loads(response.text)))
             return Response(response.status_code, json.loads(response.text), response.headers)
         except requests.exceptions.HTTPError as err:
-            raise RESTGatewayException(self._parseError(json.loads(err.response.text)))
+            raise RESTGatewayException(self._parse_error(json.loads(err.response.text)))
 
-    def _parseError(self, messageInfos) -> str:
+    def _parse_error(self, message_infos) -> str:
         messages = ''
-        for msg in messageInfos:
-            if msg['messages'] != None:
+        for msg in message_infos:
+            if msg.get('messages') is not None:
                 messages += ' '.join(msg['messages'])
 
     def post_command(self, capability_alternate_id: str, sensor_alternate_id: str, command: dict) -> Response:
@@ -81,12 +82,15 @@ class RestClient(object):
             Response -- Response object
         """
         service = '/commands/' + self.device_alternate_id
-        headers = {'Content-Type' : 'application/json'}
-        payload_json = json.dumps({"capabilityAlternateId": capability_alternate_id,"sensorAlternateId": sensor_alternate_id,"command": command})
+        headers = {'Content-Type': 'application/json'}
+        payload_json = json.dumps(
+            {"capabilityAlternateId": capability_alternate_id, "sensorAlternateId": sensor_alternate_id,
+             "command": command})
         response = self._request_gateway(service=service, headers=headers, payload=payload_json)
         return response
-        
-    def post_measures(self, capability_alternate_id: str, sensor_alternate_id: str, measures: list, sensor_type_alternate_id: int = None, timestamp: int = None) -> Response:
+
+    def post_measures(self, capability_alternate_id: str, sensor_alternate_id: str, measures: list,
+                      sensor_type_alternate_id: int = None, timestamp: int = None) -> Response:
         """Post measures over rest gateway for specified device
         
         Arguments:
@@ -99,7 +103,7 @@ class RestClient(object):
             Response -- Response object
         """
         service = '/measures/' + self.device_alternate_id
-        headers = {'Content-Type' : 'application/json'}
+        headers = {'Content-Type': 'application/json'}
         payload = {
             "timestamp": current_milli_time(),
             "capabilityAlternateId": capability_alternate_id,
@@ -127,7 +131,7 @@ class RestClient(object):
             Response -- Response object
         """
         service = '/measures/' + self.device_alternate_id
-        headers = {'Content-Type' : 'application/json'}
+        headers = {'Content-Type': 'application/json'}
         payload_json = json.dumps(messages)
         response = self._request_gateway(service=service, headers=headers, payload=payload_json)
         return response
@@ -141,7 +145,7 @@ class RESTGatewayAdapter(HTTPAdapter):
             raise ValueError('Either "pemfile" or "secret" is missing')
         self.ssl_context = self._create_ssl_context(pemfile, secret)
         super(RESTGatewayAdapter, self).__init__(*args, **kwargs)
-        
+
     def init_poolmanager(self, *args, **kwargs):
         if self.ssl_context:
             kwargs['ssl_context'] = self.ssl_context

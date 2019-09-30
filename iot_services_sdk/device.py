@@ -1,37 +1,40 @@
 """ Author: Philipp Steinrötter (steinroe) """
 
-import subprocess
 import json
 
-from .iot_service import IoTService, Response
+from .tenant_iot_service import TenantIoTService
 from .mqtt_client import MQTTClient
 from .rest_client import RestClient
 from .utils import build_query
+from .response import Response
 
-class DeviceService(IoTService):
+
+class DeviceService(TenantIoTService):
     def __init__(self,
-                instance,
-                user,
-                password):
+                 instance,
+                 user,
+                 password,
+                 tenant_id):
         """Instantiate DeviceService object
         
         Arguments:
             instance {string} -- IoT Services instance
             user {string} -- IoT Services user
             password {string} -- IoT Services password
+            tenant_id {string} -- Id of the tenant
         """
-    
-        
+
         self.service = '/devices'
 
-        IoTService.__init__(
+        TenantIoTService.__init__(
             self,
             instance=instance,
             user=user,
-            password=password
+            password=password,
+            tenant_id=tenant_id
         )
-    
-    def get_devices(self, filters=None, orderby=None, asc=True, skip=None, top=None) -> Response: 
+
+    def get_devices(self, filters=None, orderby=None, asc=True, skip=None, top=None) -> Response:
         """The endpoint returns a list of devices.
         
         Keyword Arguments:
@@ -45,8 +48,8 @@ class DeviceService(IoTService):
             Response -- Response object
         """
         query = build_query(filters=filters, orderby=orderby, asc=asc, skip=skip, top=top)
-        response = self.request_core(method='GET', service=self.service, headers=None, payload=None, accept_json=True, query=query)
-        return response
+        return super().request_core(method='GET', service=self.service, headers=None, payload=None, accept_json=True,
+                                    query=query)
 
     def create_device(self, gateway_id: str, name: str, as_router=False, custom_properties=None) -> Response:
         """This endpoint is used to create a device.
@@ -59,14 +62,23 @@ class DeviceService(IoTService):
         Returns:
             Response --  Response object
         """
-        headers = {'Content-Type' : 'application/json'}
-        payload = {"gatewayId": gateway_id,"name": name,"customProperties": custom_properties}
+        headers = {'Content-Type': 'application/json'}
+        payload = {"gatewayId": gateway_id, "name": name, "customProperties": custom_properties}
         if as_router is True:
             payload['authorizations'] = [{'type': 'router'}]
         payload_json = json.dumps(payload)
-        response = self.request_core(method='POST', service=self.service, headers=headers, payload=payload_json, accept_json=True)
-        return response
-    
+        return super().request_core(method='POST', service=self.service, headers=headers, payload=payload_json,
+                                    accept_json=True)
+
+    def get_device_count(self) -> Response:
+        """The endpoint returns the count of all devices.
+
+        Returns:
+            Response -- Response object
+        """
+        service = self.service + '/count'
+        return super().request_core(method='GET', service=service, accept_json=True)
+
     def delete_device(self, device_id: str) -> Response:
         """The endpoint is used to delete the device associated to the given id.
 
@@ -77,9 +89,8 @@ class DeviceService(IoTService):
             Response -- Response object
         """
         service = self.service + '/' + device_id
-        response = self.request_core(method='DELETE', service=service)
-        return response
-    
+        return super().request_core(method='DELETE', service=service)
+
     def get_device(self, device_id: str) -> Response:
         """The endpoint returns the device associated to the given id.
         
@@ -90,9 +101,8 @@ class DeviceService(IoTService):
             Response -- Response object
         """
         service = self.service + '/' + device_id
-        response = self.request_core(method='GET', service=service, accept_json=True)
-        return response
-    
+        return super().request_core(method='GET', service=service, accept_json=True)
+
     def update_device(self, device_id: str, name: str) -> Response:
         """This endpoint is used to update the device associated to the given id with details specified in the request body. This endpoint can only be used to modify a devices name. To update custom properties, sensors or authentications, use the respective APIs.
         
@@ -104,10 +114,21 @@ class DeviceService(IoTService):
             Response -- Response object
         """
         service = self.service + '/' + device_id
-        headers = {'Content-Type' : 'application/json'}
+        headers = {'Content-Type': 'application/json'}
         payload = '{ "name" : "' + name + '" }'
-        response = self.request_core(method='PUT', service=service, headers=headers, payload=payload, accept_json=True)
-        return response
+        return super().request_core(method='PUT', service=service, headers=headers, payload=payload, accept_json=True)
+
+    def get_device_certs(self, device_id: str) -> Response:
+        """The endpoint is used to list the fingerprints and expiration dates for device certificates of the given device.
+
+        Arguments:
+            device_id {str} -- Unique identifier of a device
+
+        Returns:
+            Response -- Response object
+        """
+        service = self.service + '/' + device_id + '/authentications/clientCertificate'
+        return super().request_core(method='GET', service=service, accept_json=True)
 
     def get_device_p12(self, device_id: str) -> Response:
         """The endpoint is used to download device specific p12 file for authentication.
@@ -119,9 +140,8 @@ class DeviceService(IoTService):
             Response -- Response object
         """
         service = self.service + '/' + device_id + '/authentications/clientCertificate/p12'
-        response = self.request_core(method='GET', service=service, accept_json=True)
-        return response
-    
+        return super().request_core(method='GET', service=service, accept_json=True)
+
     def get_device_pem(self, device_id: str) -> Response:
         """Used to download a device specific private key and certificate in PEM format for authentication.
         
@@ -132,8 +152,35 @@ class DeviceService(IoTService):
             Response -- Response object
         """
         service = self.service + '/' + device_id + '/authentications/clientCertificate/pem'
-        response = self.request_core(method='GET', service=service, accept_json=True)
-        return response
+        return super().request_core(method='GET', service=service, accept_json=True)
+
+    def create_device_pem(self, device_id: str, request: dict) -> Response:
+        """The endpoint is used to create a device specific certificate in PEM format for authentication.
+
+        Arguments:
+            device_id {str} -- Unique identifier of a device
+            request {dict} -- Specification of the certificate signing request for the device certificate.
+
+        Returns:
+            Response -- Response object
+        """
+        service = self.service + '/' + device_id + '/authentications/clientCertificate/pem'
+        headers = {'Content-Type': 'application/json'}
+        payload = json.dumps(request)
+        return super().request_core(method='POST', service=service, headers=headers, payload=payload, accept_json=True)
+
+    def revoke_device_cert(self, device_id: str, fingerprint: str) -> Response:
+        """The endpoint is used to revoke a certificate of the given device.
+
+        Arguments:
+            device_id {str} -- Unique identifier of a device
+            fingerprint {str} -- The fingerprint of the certificate hashed with SHA-256 in hex format.
+
+        Returns:
+            Response -- Response object
+        """
+        service = self.service + '/' + device_id + '/authentications/clientCertificate/' + fingerprint
+        return super().request_core(method='DELETE', service=service)
 
     def send_command_to_device(self, device_id: str, capability_id: str, sensor_id: str, command: dict) -> Response:
         """Used to send the command specified in the request body to the device associated to the given id.
@@ -148,10 +195,9 @@ class DeviceService(IoTService):
             Response -- Response object
         """
         service = self.service + '/' + device_id + '/commands'
-        headers = {'Content-Type' : 'application/json'}
-        payload = json.dumps({"capabilityId": capability_id,"sensorId": sensor_id,"command": command})
-        response = self.request_core(method='POST', service=service, headers=headers, payload=payload, accept_json=True)
-        return response
+        headers = {'Content-Type': 'application/json'}
+        payload = json.dumps({"capabilityId": capability_id, "sensorId": sensor_id, "command": command})
+        return super().request_core(method='POST', service=service, headers=headers, payload=payload, accept_json=True)
 
     def add_custom_property_to_device(self, device_id: str, key: str, value: str) -> Response:
         """Used to add a custom property to the device associated to the given id.
@@ -163,12 +209,11 @@ class DeviceService(IoTService):
         
         Returns:
             Response -- Response object
-        """  
+        """
         service = self.service + '/' + device_id + '/customProperties'
-        headers = {'Content-Type' : 'application/json'}
+        headers = {'Content-Type': 'application/json'}
         payload = '{ "key" : "' + key + '", "value" : "' + value + '" }'
-        response = self.request_core(method='POST', service=service, headers=headers, payload=payload, accept_json=True)
-        return response
+        return super().request_core(method='POST', service=service, headers=headers, payload=payload, accept_json=True)
 
     def delete_custom_property(self, device_id: str, key: str) -> Response:
         """Delete a custom property from the device associated to the given id.
@@ -181,8 +226,7 @@ class DeviceService(IoTService):
             Response -- Response object
         """
         service = self.service + '/' + device_id + '/customProperties/' + key
-        response = self.request_core(method='DELETE', service=service, accept_json=True)
-        return response
+        return super().request_core(method='DELETE', service=service, accept_json=True)
 
     def update_custom_property(self, device_id: str, key: str, value: str) -> Response:
         """Updates a custom property of the device associated to the given id. The ‘key’ attribute cannot be modified.
@@ -194,12 +238,11 @@ class DeviceService(IoTService):
         
         Returns:
             Response -- Response object
-        """ 
+        """
         service = self.service + '/' + device_id + '/customProperties/' + key
-        headers = {'Content-Type' : 'application/json'}
+        headers = {'Content-Type': 'application/json'}
         payload = '{ "key" : "' + key + '", "value" : "' + value + '" }'
-        response = self.request_core(method='PUT', service=service, headers=headers, payload=payload, accept_json=True)
-        return response
+        return super().request_core(method='PUT', service=service, headers=headers, payload=payload, accept_json=True)
 
     def get_mqtt_client(self, device_alternate_id: str, pemfile: str, secret: str) -> MQTTClient:
         """Returns MQTT client for specified router device
@@ -242,8 +285,7 @@ class DeviceService(IoTService):
         
         Returns:
             Response -- Response object
-        """ 
+        """
         service = self.service + '/' + device_id + '/measures'
         query = build_query(filters=filters, orderby=orderby, asc=asc, skip=skip, top=top)
-        response = self.request_core(method='GET', service=service, query=query, accept_json=True)
-        return response
+        return super().request_core(method='GET', service=service, query=query, accept_json=True)

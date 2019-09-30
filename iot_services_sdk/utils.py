@@ -1,8 +1,9 @@
 """ Author: Philipp Steinrötter (steinroe) """
 
-import subprocess
-import os
 import time
+import logging
+from http.client import HTTPConnection
+
 
 def build_query(filters=None, orderby=None, asc=True, skip=None, top=None) -> str:
     """Builds query string
@@ -17,7 +18,7 @@ def build_query(filters=None, orderby=None, asc=True, skip=None, top=None) -> st
     Returns:
         str -- Query string
     """
-    query_string='?'
+    query_string = '?'
     if filters is not None and len(filters) > 0:
         query_string += 'filter='
         for idx, filter_query in enumerate(filters):
@@ -40,7 +41,7 @@ def build_query(filters=None, orderby=None, asc=True, skip=None, top=None) -> st
         if len(query_string) is not 1:
             query_string += '&'
         query_string += 'top=' + top
-    
+
     if query_string != '?':
         return query_string
     else:
@@ -49,3 +50,28 @@ def build_query(filters=None, orderby=None, asc=True, skip=None, top=None) -> st
 
 def current_milli_time():
     return int(round(time.time() * 1000))
+
+
+def debug_requests_on():
+    """Switches on logging of the requests module.
+    """
+    HTTPConnection.debuglevel = 1
+
+    logging.basicConfig()
+    logging.getLogger().setLevel(logging.DEBUG)
+    requests_log = logging.getLogger("requests.packages.urllib3")
+    requests_log.setLevel(logging.DEBUG)
+    requests_log.propagate = True
+
+
+def debug_requests_off():
+    """Switches off logging of the requests module.
+    """
+    HTTPConnection.debuglevel = 0
+
+    root_logger = logging.getLogger()
+    root_logger.setLevel(logging.WARNING)
+    root_logger.handlers = []
+    requests_log = logging.getLogger("requests.packages.urllib3")
+    requests_log.setLevel(logging.WARNING)
+    requests_log.propagate = False

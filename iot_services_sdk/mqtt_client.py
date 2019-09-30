@@ -11,9 +11,11 @@ import paho.mqtt.client as mqtt
 
 from .utils import current_milli_time
 
+
 class PahoMQTT(mqtt.Client):
     """Overwrites the mqtt.Client class to work with password protected pem files
     """
+
     def tls_set(self, ca_certs=None, pemfile=None, secret=None, tls_version=None):
         """Configure network encryption and authentication options. Enables SSL/TLS support.
         ca_certs : a string path to the Certificate Authority certificate files
@@ -62,8 +64,9 @@ class PahoMQTT(mqtt.Client):
         context.load_default_certs()
 
         self.tls_set_context(context)
-       
-        self.tls_insecure_set(False)    
+
+        self.tls_insecure_set(False)
+
 
 class MQTTClient(PahoMQTT):
     """Wrapper around the Paho MQTT Client to simplify its usage with the IoTS Cloud Gateway
@@ -161,7 +164,8 @@ class MQTTClient(PahoMQTT):
         parsed_message = json.loads(message.payload.decode("utf-8"))
         self.on_command(self, userdata, parsed_message)
 
-    def publish(self, capability_alternate_id: str, sensor_alternate_id: str, measures: list, device_alternate_id: str = None, timestamp: int = None) -> mqtt.MQTTMessageInfo:
+    def publish(self, capability_alternate_id: str, sensor_alternate_id: str, measures: list,
+                device_alternate_id: str = None, timestamp: int = None) -> mqtt.MQTTMessageInfo:
         """Publishes measures to the IoT Services
         
         Arguments:
@@ -176,7 +180,7 @@ class MQTTClient(PahoMQTT):
         """
         if device_alternate_id is None:
             device_alternate_id = self.device_alternate_id
-        
+
         service = 'measures/' + device_alternate_id
         measure_message_id = str(uuid.uuid4())
         payload = {
@@ -188,7 +192,7 @@ class MQTTClient(PahoMQTT):
         }
 
         if timestamp is not None:
-            payload['timestamp'] = timestamp            
+            payload['timestamp'] = timestamp
 
         self._message_buffer[measure_message_id] = payload
         payload_json = json.dumps(payload)

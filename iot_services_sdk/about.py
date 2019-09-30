@@ -1,13 +1,22 @@
 """ Author: Philipp Steinrötter (steinroe) """
 
-from .iot_service import IoTService, Response
+from .iot_service import IoTService
+from .response import Response
+
 
 class AboutService(IoTService):
     def __init__(self,
-                instance,
-                user,
-                password):
-        
+                 instance,
+                 user,
+                 password):
+        """Instantiate AboutService object
+
+        Arguments:
+            instance {string} -- IoT Services instance
+            user {string} -- IoT Services user
+            password {string} -- IoT Services password
+        """
+
         self.service = '/about'
 
         IoTService.__init__(
