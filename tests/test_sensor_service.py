@@ -11,7 +11,8 @@ class SensorServiceTest(unittest.TestCase):
 
         self.sensor_service = SensorService(instance=config['IOTS']['instance'],
                                             user=config['IOTS']['user'],
-                                            password=config['IOTS']['password'])
+                                            password=config['IOTS']['password'],
+                                            tenant_id=config['IOTS']['tenant_id'])
 
     def test_get_sensors(self) -> None:
         pass

@@ -23,23 +23,28 @@ class RESTTest(unittest.TestCase):
 
         self.capability_service = CapabilityService(instance = config['IOTS']['instance'],
                                     user = config['IOTS']['user'],
-                                    password = config['IOTS']['password'])
+                                    password = config['IOTS']['password'],
+                                    tenant_id=config['IOTS']['tenant_id'])
 
         self.device_service = DeviceService(instance = config['IOTS']['instance'],
                                     user = config['IOTS']['user'],
-                                    password = config['IOTS']['password'])
+                                    password = config['IOTS']['password'],
+                                    tenant_id=config['IOTS']['tenant_id'])
 
         self.gateway_service = GatewayService(instance = config['IOTS']['instance'],
                                             user = config['IOTS']['user'],
-                                            password = config['IOTS']['password'])
+                                            password = config['IOTS']['password'],
+                                            tenant_id=config['IOTS']['tenant_id'])
 
         self.sensor_type_service = SensorTypeService(instance = config['IOTS']['instance'],
                                             user = config['IOTS']['user'],
-                                            password = config['IOTS']['password'])
+                                            password = config['IOTS']['password'],
+                                            tenant_id=config['IOTS']['tenant_id'])
 
         self.sensor_service = SensorService(instance = config['IOTS']['instance'],
                                             user = config['IOTS']['user'],
-                                            password = config['IOTS']['password'])
+                                            password = config['IOTS']['password'],
+                                            tenant_id=config['IOTS']['tenant_id'])
 
         if False:
             self.capability_service.debug_requests_on()

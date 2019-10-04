@@ -21,23 +21,28 @@ class MQTTTest(unittest.TestCase):
 
         self.capability_service = CapabilityService(instance = config['IOTS']['instance'],
                                     user = config['IOTS']['user'],
-                                    password = config['IOTS']['password'])
+                                    password = config['IOTS']['password'],
+                                    tenant_id=config['IOTS']['tenant_id'])
 
         self.device_service = DeviceService(instance = config['IOTS']['instance'],
                                     user = config['IOTS']['user'],
-                                    password = config['IOTS']['password'])
+                                    password = config['IOTS']['password'],
+                                    tenant_id=config['IOTS']['tenant_id'])
 
         self.gateway_service = GatewayService(instance = config['IOTS']['instance'],
                                             user = config['IOTS']['user'],
-                                            password = config['IOTS']['password'])
+                                            password = config['IOTS']['password'],
+                                            tenant_id=config['IOTS']['tenant_id'])
 
         self.sensor_type_service = SensorTypeService(instance = config['IOTS']['instance'],
                                             user = config['IOTS']['user'],
-                                            password = config['IOTS']['password'])
+                                            password = config['IOTS']['password'],
+                                            tenant_id=config['IOTS']['tenant_id'])
 
         self.sensor_service = SensorService(instance = config['IOTS']['instance'],
                                             user = config['IOTS']['user'],
-                                            password = config['IOTS']['password'])
+                                            password = config['IOTS']['password'],
+                                            tenant_id=config['IOTS']['tenant_id'])
 
         if False:
             self.capability_service.debug_requests_on()
@@ -133,7 +138,7 @@ class MQTTTest(unittest.TestCase):
 
         get_measures_response = self.device_service.get_measures(self.device_id)
         measures = get_measures_response.get_result()
-        self.assertEqual(len(measures), 1)
+        self.assertGreaterEqual(len(measures), 1)
 
     def test_ingestion_error(self):
         def on_error(client, userdata, report):

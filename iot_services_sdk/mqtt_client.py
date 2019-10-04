@@ -132,7 +132,6 @@ class MQTTClient(PahoMQTT):
 
     def _ack_message_handler(self, client, userdata, message):
         message_infos = json.loads(message.payload.decode("utf-8"))
-        print(message_infos)
         report = []
         for msg_info in message_infos:
             if msg_info.get('code') != 200 and msg_info.get('code') != 202:
