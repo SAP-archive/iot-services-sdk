@@ -1,5 +1,5 @@
 """ Author: Philipp Steinrötter (steinroe) """
-
+import os
 import unittest
 
 from .config import get_config
@@ -59,11 +59,8 @@ class DeviceServiceTest(unittest.TestCase):
         self.assertEqual(get_device_response.get_status_code(), 200)
 
     def test_f_get_device_certs(self) -> None:
-        try:
-            self.device_service.get_device_certs(self.device.get('id'))
-            self.assertEqual(0, 1)
-        except DeviceManagementAPIException:
-            self.assertEqual(0, 0)
+        get_certs_response = self.device_service.get_device_certs(self.device.get('id'))
+        self.assertEqual(get_certs_response.get_status_code(), 200)
 
     def test_g_get_device_p12(self) -> None:
         get_p12_response = self.device_service.get_device_p12(self.device.get('id'))
@@ -74,31 +71,41 @@ class DeviceServiceTest(unittest.TestCase):
         self.assertEqual(get_pem_response.get_status_code(), 200)
 
     def test_i_create_device_pem(self) -> None:
+        # Not yet implemented
         pass
 
     def test_j_revoke_device_cert(self) -> None:
+        # Not yet implemented
         pass
 
     def test_k_send_command_to_device(self) -> None:
+        # Is tested in MQTT Ingestion Test
         pass
 
-    def test_l_add_custom_property_to_device(self) -> None:
-        pass
+    def test_custom_property(self) -> None:
+        add_property_response = self.device_service.add_custom_property(self.device.get('id'), 'sdktest', 'success')
+        self.assertEqual(add_property_response.get_status_code(), 200)
+        self.assertEqual(add_property_response.get_result().get('value'), 'success')
 
-    def test_m_delete_custom_property(self) -> None:
-        pass
+        update_property_response = self.device_service.update_custom_property(self.device.get('id'), 'sdktest', 'success2')
+        self.assertEqual(update_property_response.get_status_code(), 200)
+        self.assertEqual(update_property_response.get_result().get('value'), 'success2')
 
-    def test_n_update_custom_property(self) -> None:
-        pass
+        delete_property_response = self.device_service.delete_custom_property(self.device.get('id'), 'sdktest')
+        self.assertEqual(delete_property_response.get_status_code(), 200)
 
     def test_o_get_mqtt_client(self) -> None:
+        # Is tested in MQTT Ingestion
         pass
 
     def test_p_get_rest_client(self) -> None:
+        # Is tested in REST Ingestion
         pass
 
     def test_q_get_measures(self) -> None:
-        pass
+        measures_response = self.device_service.get_measures(self.device.get('id'))
+        self.assertEqual(measures_response.get_status_code(), 200)
+        self.assertEqual(measures_response.get_result(), [])
 
     def test_r_delete_device(self) -> None:
         delete_response = self.device_service.delete_device(self.device.get('id'))

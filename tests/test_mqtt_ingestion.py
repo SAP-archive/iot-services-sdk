@@ -140,11 +140,12 @@ class MQTTTest(unittest.TestCase):
         measures = get_measures_response.get_result()
         self.assertGreaterEqual(len(measures), 1)
 
-    def test_ingestion_error(self):
-        def on_error(client, userdata, report):
-            self.error_received = True
+    def _on_error(self, client, userdata, report):
+        print(report)
+        self.error_received = True
 
-        self.mqtt_client.on_error = on_error
+    def test_ingestion_error(self):
+        self.mqtt_client.on_error = self._on_error
 
         measures = [
             {'i_am_invalid': 30}
@@ -155,11 +156,11 @@ class MQTTTest(unittest.TestCase):
 
         self.assertTrue(self.error_received)
 
-    def test_commands(self):
-        def on_command(client, userdata, command):
-            self.command_received = True
+    def _on_command(self, client, userdata, command):
+        self.command_received = True
 
-        self.mqtt_client.on_command = on_command
+    def test_commands(self):
+        self.mqtt_client.on_command = self._on_command
 
         self.mqtt_client.subscribe(self.device_alternate_id)
 
@@ -170,7 +171,6 @@ class MQTTTest(unittest.TestCase):
 
         time.sleep(2)
 
-        # Check if command was received
         self.assertTrue(self.command_received)
 
     def tearDown(self):

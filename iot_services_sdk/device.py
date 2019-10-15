@@ -154,7 +154,7 @@ class DeviceService(TenantIoTService):
         service = self.service + '/' + device_id + '/authentications/clientCertificate/pem'
         return super().request_core(method='GET', service=service, accept_json=True)
 
-    def create_device_pem(self, device_id: str, request: dict) -> Response:
+    def create_device_pem(self, device_id: str, csr: str) -> Response:
         """The endpoint is used to create a device specific certificate in PEM format for authentication.
 
         Arguments:
@@ -164,10 +164,14 @@ class DeviceService(TenantIoTService):
         Returns:
             Response -- Response object
         """
-        service = self.service + '/' + device_id + '/authentications/clientCertificate/pem'
-        headers = {'Content-Type': 'application/json'}
-        payload = json.dumps(request)
-        return super().request_core(method='POST', service=service, headers=headers, payload=payload, accept_json=True)
+        # service = self.service + '/' + device_id + '/authentications/clientCertificate/pem'
+        # headers = {'Content-Type': 'application/json'}
+        # payload = json.dumps({
+        #     'csr': csr,
+        #     'type': 'clientCertificate'
+        # })
+        # return super().request_core(method='POST', service=service, headers=headers, payload=payload, accept_json=True)
+        raise NotImplementedError('This method is not supported yet.')
 
     def revoke_device_cert(self, device_id: str, fingerprint: str) -> Response:
         """The endpoint is used to revoke a certificate of the given device.
@@ -179,8 +183,9 @@ class DeviceService(TenantIoTService):
         Returns:
             Response -- Response object
         """
-        service = self.service + '/' + device_id + '/authentications/clientCertificate/' + fingerprint
-        return super().request_core(method='DELETE', service=service)
+        # service = self.service + '/' + device_id + '/authentications/clientCertificate/' + fingerprint
+        # return super().request_core(method='DELETE', service=service)
+        raise NotImplementedError('This method is not supported yet.')
 
     def send_command_to_device(self, device_id: str, capability_id: str, sensor_id: str, command: dict) -> Response:
         """Used to send the command specified in the request body to the device associated to the given id.
@@ -199,7 +204,7 @@ class DeviceService(TenantIoTService):
         payload = json.dumps({"capabilityId": capability_id, "sensorId": sensor_id, "command": command})
         return super().request_core(method='POST', service=service, headers=headers, payload=payload, accept_json=True)
 
-    def add_custom_property_to_device(self, device_id: str, key: str, value: str) -> Response:
+    def add_custom_property(self, device_id: str, key: str, value: str) -> Response:
         """Used to add a custom property to the device associated to the given id.
         
         Arguments:
