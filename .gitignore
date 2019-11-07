@@ -127,3 +127,4 @@ config.ini
 .idea/*
 
 test.py
+cleanup.py
