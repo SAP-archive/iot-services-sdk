@@ -14,6 +14,10 @@ class GatewayServiceTest(unittest.TestCase):
                                               password=config['IOTS']['password'],
                                               tenant_id=config['IOTS']['tenant_id'])
 
+    def test_a_gateway(self) -> None:
+        
+        pass
+
     def test_get_gateways(self) -> None:
         pass
 

@@ -141,7 +141,6 @@ class MQTTTest(unittest.TestCase):
         self.assertGreaterEqual(len(measures), 1)
 
     def _on_error(self, client, userdata, report):
-        print(report)
         self.error_received = True
 
     def test_ingestion_error(self):

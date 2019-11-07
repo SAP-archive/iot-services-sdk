@@ -70,10 +70,11 @@ class RestClient(object):
             if msg.get('messages') is not None:
                 messages += ' '.join(msg['messages'])
 
-    def post_command(self, capability_alternate_id: str, sensor_alternate_id: str, command: dict) -> Response:
+    def post_command(self, capability_alternate_id: str, sensor_alternate_id: str, command: dict, device_alternate_id: str = None) -> Response:
         """Post commands over rest gateway for specified device
         
         Arguments:
+            device_alternate_id {str} -- Alternate ID of the device. If none, the device from the client id will be used.
             capability_alternate_id {str} -- Alternate ID for capability
             sensor_alternate_id {str} -- Alternate ID for sensor
             command {dict} -- Dict with the keys and respective values of the desired commands
@@ -81,7 +82,10 @@ class RestClient(object):
         Returns:
             Response -- Response object
         """
-        service = '/commands/' + self.device_alternate_id
+        if device_alternate_id is None:
+            device_alternate_id = self.device_alternate_id
+
+        service = '/commands/' + device_alternate_id
         headers = {'Content-Type': 'application/json'}
         payload_json = json.dumps(
             {"capabilityAlternateId": capability_alternate_id, "sensorAlternateId": sensor_alternate_id,
@@ -90,7 +94,7 @@ class RestClient(object):
         return response
 
     def post_measures(self, capability_alternate_id: str, sensor_alternate_id: str, measures: list,
-                      sensor_type_alternate_id: int = None, timestamp: int = None) -> Response:
+                      sensor_type_alternate_id: int = None, timestamp: int = None, device_alternate_id: str = None) -> Response:
         """Post measures over rest gateway for specified device
         
         Arguments:
@@ -98,11 +102,15 @@ class RestClient(object):
             sensor_alternate_id {str} -- Alternate ID for sensor
             measures {list} -- List of key-value pairs with the keys and respective values of the desired measures
             sensor_type_alternate_id {int} -- (Optional) If this parameter is set, the device will be auto-onboarded if it does not exist yet. Note: The alternate id of the sensor type must be numeric.
-            timestamp {int} -- UNIX time in milliseconds. If None, current time will be used.        
+            timestamp {int} -- UNIX time in milliseconds. If None, current time will be used.
+            device_alternate_id {str} -- Alternate ID of the device. If none, the device from the client id will be used.
         Returns:
             Response -- Response object
         """
-        service = '/measures/' + self.device_alternate_id
+        if device_alternate_id is None:
+            device_alternate_id = self.device_alternate_id
+
+        service = '/measures/' + device_alternate_id
         headers = {'Content-Type': 'application/json'}
         payload = {
             "timestamp": current_milli_time(),
@@ -121,16 +129,20 @@ class RestClient(object):
         response = self._request_gateway(service=service, headers=headers, payload=payload_json)
         return response
 
-    def post_batched_measures(self, messages: list) -> Response:
+    def post_batched_measures(self, messages: list, device_alternate_id: str = None) -> Response:
         """Post batched measures over rest gateway
         
         Arguments:
             messages {list} -- List of dicts, each containing sensorAlternateId, capabilityAlternateId and an array of measures as key-value pairs. If the device should be onboarded automatically, the sensorTypeAlternateId must also be provided.
-        
+            device_alternate_id {str} -- Alternate ID of the device. If none, the device from the client id will be used.
+
         Returns:
             Response -- Response object
         """
-        service = '/measures/' + self.device_alternate_id
+        if device_alternate_id is None:
+            device_alternate_id = self.device_alternate_id
+
+        service = '/measures/' + device_alternate_id
         headers = {'Content-Type': 'application/json'}
         payload_json = json.dumps(messages)
         response = self._request_gateway(service=service, headers=headers, payload=payload_json)
