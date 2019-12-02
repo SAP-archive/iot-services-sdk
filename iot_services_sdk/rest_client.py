@@ -94,7 +94,7 @@ class RestClient(object):
         return response
 
     def post_measures(self, capability_alternate_id: str, sensor_alternate_id: str, measures: list,
-                      sensor_type_alternate_id: int = None, timestamp: int = None, device_alternate_id: str = None) -> Response:
+                      sensor_type_alternate_id: int = None, use_timestamp: bool = False, timestamp: int = None, device_alternate_id: str = None) -> Response:
         """Post measures over rest gateway for specified device
         
         Arguments:
@@ -102,6 +102,7 @@ class RestClient(object):
             sensor_alternate_id {str} -- Alternate ID for sensor
             measures {list} -- List of key-value pairs with the keys and respective values of the desired measures
             sensor_type_alternate_id {int} -- (Optional) If this parameter is set, the device will be auto-onboarded if it does not exist yet. Note: The alternate id of the sensor type must be numeric.
+            use_timestamp {bool} -- If this is set to false, no timestamp will be sent.
             timestamp {int} -- UNIX time in milliseconds. If None, current time will be used.
             device_alternate_id {str} -- Alternate ID of the device. If none, the device from the client id will be used.
         Returns:
@@ -113,7 +114,6 @@ class RestClient(object):
         service = '/measures/' + device_alternate_id
         headers = {'Content-Type': 'application/json'}
         payload = {
-            "timestamp": current_milli_time(),
             "capabilityAlternateId": capability_alternate_id,
             "sensorAlternateId": sensor_alternate_id,
             "measures": measures
@@ -122,8 +122,10 @@ class RestClient(object):
         if sensor_type_alternate_id is not None:
             payload['sensorTypeAlternateId'] = sensor_type_alternate_id
 
-        if timestamp is not None:
-            payload['timestamp'] = timestamp
+        if use_timestamp:
+            payload['timestamp'] = current_milli_time()
+            if timestamp is not None:
+                payload['timestamp'] = timestamp
 
         payload_json = json.dumps(payload)
         response = self._request_gateway(service=service, headers=headers, payload=payload_json)
