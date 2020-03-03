@@ -11,7 +11,7 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 setup(
   name = 'iot_services_sdk',         
   packages = ['iot_services_sdk'],   
-  version = '2.0.1',
+  version = '2.0.2',
   license='SAP Sample Code License',        
   description = 'SDK for SAP IoT Services on Cloud Foundry. Wraps all Device Management APIs as well as both Cloud Gateways.',  
   long_description = long_description,

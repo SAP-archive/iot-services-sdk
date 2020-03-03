@@ -140,7 +140,8 @@ class MQTTClient(PahoMQTT):
                     'error': ' '.join(msg_info.get('messages'))
                 }
                 report.append(error)
-            del self._message_buffer[msg_info.get('id')]
+            if msg_info.get('id') in self._message_buffer:
+                del self._message_buffer[msg_info.get('id')]
 
         if len(report) > 0:
             self.on_error(self, userdata, report)
